@@ -26,18 +26,35 @@ namespace CustomTools
         {
             pathPoints = new List<Transform>();
             loop = canPathLoop;
+            positionRandomnessFactor = randomPathPosition;
             for (int i = 0; i < pointCount; i++)
             {
-                GameObject pathPoint = Instantiate(pathPointTemplate);
-                pathPointTemplate.name =$"PathPoint_{i}";
+                AddPoint(canAddAtBeginning: false);
+            }
+        }
 
-                pathPoint.transform.SetParent(transform);
+        public void AddPoint(bool canAddAtBeginning)
+        {
+            GameObject pathPoint = Instantiate(pathPointTemplate);
+            
+            pathPoint.transform.SetParent(transform);
 
-                Vector2 randomPoint = Random.insideUnitCircle;
-                Vector3 unitRandomPoint3D = new Vector3(randomPoint.x, 0, randomPoint.y);
-                positionRandomnessFactor = randomPathPosition;
-                pathPoint.transform.localPosition = Vector3.up * heightOffset + (Vector3.forward * distanceBetweenPoints * i) + unitRandomPoint3D * positionRandomnessFactor;
+            Vector2 randomPoint = Random.insideUnitCircle;
+            Vector3 unitRandomPoint3D = new Vector3(randomPoint.x, 0, randomPoint.y);
+            
+            //Logica piazzamento del punto nella lista
+            if(canAddAtBeginning)
+                pathPoints.Insert(0, pathPoint.transform);
+            else
                 pathPoints.Add(pathPoint.transform);
+
+            int pointIndex = canAddAtBeginning ? 0 : pathPoints.Count - 1;
+
+            pathPoint.transform.localPosition = Vector3.up * heightOffset + (Vector3.forward * distanceBetweenPoints * pointIndex) + unitRandomPoint3D * positionRandomnessFactor;
+
+            for (int i = 0; i < pathPoints.Count; i++)
+            {
+                pathPoints[i].name = $"PathPoint_{i}";
             }
         }
 
